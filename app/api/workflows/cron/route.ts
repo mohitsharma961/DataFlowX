@@ -26,7 +26,7 @@ export async function GET(req:Request){
 }
 
 function triggerWorkflow(workflowId:string){
-    const triggerApiUrl=getAppUrl(`api/workflows/execute?workflowId=$${workflowId}`);
+    const triggerApiUrl=getAppUrl(`api/workflows/execute?workflowId=${workflowId}`);
     console.log(triggerApiUrl);
     fetch(triggerApiUrl,{
         headers:{
