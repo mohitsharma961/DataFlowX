@@ -3,7 +3,6 @@ import { prisma } from "@/lib/prisma";
 import { workflowStatus } from "@/types/workflow";
 
 
-export const dynamic = 'force-dynamic';
 
 
 export async function GET(req:Request){
