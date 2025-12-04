@@ -1,32 +1,77 @@
+// import { waitFor } from "@/lib/helper/waitFor"
+// import { Environment, ExecutionEnvironment } from "@/types/executor";
+// import puppeteer from "puppeteer"
+// import { LaunchBrowserTask } from "../task/LaunchBrowser";
+
+
+
+// export async function LaunchBrowserExecutor(environment:ExecutionEnvironment<typeof LaunchBrowserTask>):Promise<boolean>{
+    
+//    try {
+//     const websiteUrl=environment.getInput("website Url");
+//     const browser=await puppeteer.launch({
+//         headless:true,
+//     })
+//      environment.log.info("Browser started successfully")
+//     environment.setBrowser(browser);
+//     const page=await browser.newPage();
+
+
+//     await page.goto(websiteUrl);
+//     await waitFor(2000);
+//     environment.setPage(page);
+
+//      environment.log.info(`Opened page at ${websiteUrl}`)
+//     return true;
+//    } catch (error:any) {
+//     environment.log.error(error.message);
+//     return false;
+//    }
+// }
+
+
+
 import { waitFor } from "@/lib/helper/waitFor"
 import { Environment, ExecutionEnvironment } from "@/types/executor";
 import puppeteer from "puppeteer"
 import { LaunchBrowserTask } from "../task/LaunchBrowser";
 
-
-
-export async function LaunchBrowserExecutor(environment:ExecutionEnvironment<typeof LaunchBrowserTask>):Promise<boolean>{
+export async function LaunchBrowserExecutor(
+  environment: ExecutionEnvironment<typeof LaunchBrowserTask>
+): Promise<boolean> {
+  try {
+    const websiteUrl = environment.getInput("website Url");
     
-   try {
-    const websiteUrl=environment.getInput("website Url");
-    const browser=await puppeteer.launch({
-        headless:true,
-    })
-     environment.log.info("Browser started successfully")
+    const browser = await puppeteer.launch({
+      headless: true, // Must be true in production
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--no-first-run',
+        '--no-zygote',
+        '--single-process', // Required for some hosting platforms
+      ],
+      ...(process.env.NODE_ENV === 'production' && {
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser'
+      })
+    });
+
+    environment.log.info("Browser started successfully");
     environment.setBrowser(browser);
-    const page=await browser.newPage();
-
-
+    
+    const page = await browser.newPage();
     await page.goto(websiteUrl);
     await waitFor(2000);
     environment.setPage(page);
 
-     environment.log.info(`Opened page at ${websiteUrl}`)
+    environment.log.info(`Opened page at ${websiteUrl}`);
     return true;
-   } catch (error:any) {
+  } catch (error: any) {
     environment.log.error(error.message);
     return false;
-   }
+  }
 }
 
 
